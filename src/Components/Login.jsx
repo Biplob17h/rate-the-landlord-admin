@@ -4,16 +4,18 @@ import { AuthContext } from "../ContextApi/UserContext";
 const Login = () => {
   const [error, setError] = useState("");
   const { refresh, setRefresh } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   // handle submit
   const handleLoginSubmit = (event) => {
+    setLoading(true);
     event.preventDefault();
     setError("");
 
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    fetch(`https://rate-the-landlord-server-1.onrender.com/api/v1/admin/login`, {
+    fetch(`http://localhost:5000/api/v1/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,6 +27,7 @@ const Login = () => {
         if (data.status === "success") {
           localStorage.setItem("landLordAdmin", JSON.stringify(data.data));
           setRefresh(refresh + 1);
+          setLoading(false);
         } else {
           setError(data.message);
         }
@@ -66,7 +69,14 @@ const Login = () => {
               </div>
               <p className="text-center text-red-600">{error}</p>
               <div className="mt-6 form-control">
-                <button className="btn btn-primary">Login</button>
+                <button className="btn btn-primary">
+                  <span
+                    className={`loading loading-spinner ${
+                      loading ? "" : "hidden"
+                    }`}
+                  ></span>
+                  <h1 className="ml-3">Login</h1>
+                </button>
               </div>
             </form>
           </div>

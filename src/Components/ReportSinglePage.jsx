@@ -11,15 +11,15 @@ const ReportSinglePage = ({
   setShow,
   refreshUnread,
   setRefreshUnread,
+  refreshReview,
+  setRefreshReview,
 }) => {
   const { landlordName, city, state, review, location, rating, _id } =
     singleReport.review || {};
 
   const [newCity, setNewCity] = useState("");
   const [newState, setNewState] = useState("");
-  const [newAddress, setNewAddress] = useState("");
-
-  console.log(newAddress);
+  const [newAddress, setNewAddress] = useState(location);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -28,18 +28,22 @@ const ReportSinglePage = ({
 
     const landlordName = landlord.toUpperCase();
 
+    if (newAddress === "") {
+      toast.error("Address field cannot be empty!");
+      return;
+    }
+
     const newReview = {
       id: _id,
       landlordName,
-      city: newCity,
-      state: newState,
+      city: newCity || city,
+      state: newState || state,
       review: review,
       location: newAddress,
     };
 
-    console.log(newReview)
 
-    fetch("https://rate-the-landlord-server-1.onrender.com/api/v1/review/update", {
+    fetch("http://localhost:5000/api/v1/review/update", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -48,17 +52,17 @@ const ReportSinglePage = ({
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
         if (data.status === "success") {
           toast.success("Review updated successfully!");
           setShow("reports");
           setRefreshUnread(refreshUnread + 1);
+          setRefreshReview(refreshReview + 1);
         }
       });
   };
 
   const handleDeleteReport = () => {
-    fetch(`https://rate-the-landlord-server-1.onrender.com/api/v1/report/delete/${singleReport?._id}`, {
+    fetch(`http://localhost:5000/api/v1/report/delete/${singleReport?._id}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -81,18 +85,18 @@ const ReportSinglePage = ({
 
   return (
     <div className={`${show === "singleReport" ? "" : "hidden"}`}>
-      <h1 className="text-5xl mt-10 font-bold text-center">
+      <h1 className="text-3xl md:text-5xl mt-20 md:mt-10 font-bold text-center">
         Report Single Page
       </h1>
 
       <form onSubmit={handleSubmit} className="mb-20">
-        <section className="border mt-10 min-h-full pb-10 mx-10 px-10 pt-5">
-          <h1 className="text-2xl text-red-600 font-semibold mb-10 ml-4">
+        <section className="border mt-10 min-h-full pb-10 rounded mx-5 md:mx-10 md:px-10 pt-5">
+          <h1 className="text-[16px] md:text-2xl text-red-600 font-semibold mb-10 ml-4">
             Report : {singleReport?.report}
           </h1>
 
           {/* Landlord Name */}
-          <div className="flex">
+          <div className="block md:flex ">
             <div className="form-control w-full px-3">
               <label className="label">
                 <span className="label-text">Landlord</span>
@@ -124,7 +128,7 @@ const ReportSinglePage = ({
           </div>
 
           {/* State and Country */}
-          <div className="flex pt-5">
+          <div className="block md:flex pt-5">
             <div className="form-control w-full px-3">
               <label className="label">
                 <span className="label-text">State</span>
@@ -183,7 +187,7 @@ const ReportSinglePage = ({
         </section>
 
         {/* Buttons */}
-        <div className="flex justify-between mx-40">
+        <div className="flex flex-col-reverse md:flex-row justify-between md:mx-40">
           <div className="flex justify-center gap-4 mt-8 pb-20">
             <button
               onClick={() => {
@@ -197,7 +201,7 @@ const ReportSinglePage = ({
             </button>
             <button
               onClick={handleDeleteReport}
-              type="submit"
+              type="button"
               className="btn bg-red-600 text-white hover:bg-[#be1a1a] w-[150px]"
             >
               Delete

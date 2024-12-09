@@ -58,7 +58,7 @@ const AddressFrom = ({ setNewAddress, setNewCity, setNewState, location }) => {
   
 
   return (
-    <div className="w-full ml-5">
+    <div className="w-full ml-0 md:ml-5 px-2 md:px-0">
       {isLoaded && (
         <StandaloneSearchBox
           onLoad={(ref) => (inputRef.current = ref)}
